@@ -22,10 +22,10 @@ class Sampler:
     def update_chances(self, losses: np.ndarray):
         assert losses.shape in ((self.size,), (self.size, 1))
         losses = np.squeeze(losses)
-        print(np.mean(losses))
         proportional = losses / np.sum(losses)
-        self._chances = (proportional + self._equal_chances) / 2
-        print(np.sum(self._chances))
+        self._chances = 9 * proportional + self._equal_chances
+        self._chances /= np.sum(self._chances)
+
 
     def sample(self):
         selected_idx = np.random.choice(self._indexes, self.batch_size, p=self._chances)
