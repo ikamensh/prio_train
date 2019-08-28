@@ -2,7 +2,7 @@ from tensorflow.python.keras import layers
 import tensorflow as tf
 from tensorflow.python.keras.optimizers import Adam
 
-cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy()
 
 def make_discriminator_model(num_classes, color_ch = 3):
     cnn = tf.keras.Sequential()
@@ -13,7 +13,7 @@ def make_discriminator_model(num_classes, color_ch = 3):
     cnn.add(layers.Conv2D(256, 5, strides=2, padding='same'))
     cnn.add(layers.BatchNormalization())
     cnn.add(layers.LeakyReLU())
-    cnn.add(layers.Dropout(0.2))
+    # cnn.add(layers.Dropout(0.2))
 
     cnn.add(layers.Conv2D(128, 4, padding='same'))
     cnn.add(layers.BatchNormalization())
@@ -22,7 +22,7 @@ def make_discriminator_model(num_classes, color_ch = 3):
     cnn.add(layers.Conv2D(256, 5, strides=2, padding='same'))
     cnn.add(layers.BatchNormalization())
     cnn.add(layers.LeakyReLU())
-    cnn.add(layers.Dropout(0.2))
+    # cnn.add(layers.Dropout(0.2))
 
     cnn.add(layers.Flatten())
     cnn.add(layers.Dense(256))
@@ -42,7 +42,7 @@ def make_discriminator_model(num_classes, color_ch = 3):
 
     assert discriminator.input_shape == (None, 32, 32, 3)
 
-    discriminator.compile(optimizer=Adam(lr=3e-2), loss=cross_entropy)
+    discriminator.compile(optimizer=Adam(), loss=cross_entropy)
 
     return discriminator
 

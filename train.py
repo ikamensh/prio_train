@@ -1,20 +1,18 @@
 import time
 import os
 
-import tensorflow as tf
 import numpy as np
 
 from data import cifar_sampler, train_images, train_labels, test_labels, test_images
-from net import make_discriminator_model
+from net import make_discriminator_model, cross_entropy
 from util.plotting import plot_statistic
 
-cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 
 from data import BATCH_SIZE
 batches_per_epoch = len(train_labels) // BATCH_SIZE
 
 
-from ilya_ezplot import Metric, ez_plot, plot_group
+from ilya_ezplot import Metric, plot_group
 
 
 def calc_n_images(epochs, batches):
@@ -62,7 +60,7 @@ def train_model(d, epochs: int):
 
 if __name__ == "__main__":
     model = make_discriminator_model(num_classes=10)
-    train_model(model, 50)
+    train_model(model, 100)
 
 
 
