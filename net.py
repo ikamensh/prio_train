@@ -1,32 +1,34 @@
 from tensorflow.python.keras import layers
 import tensorflow as tf
+from tensorflow.python.keras.optimizers import Adam
 
 def make_discriminator_model(num_classes, color_ch = 3):
     cnn = tf.keras.Sequential()
-    # cnn.add(layers.Conv2D(32, 4, padding='same'))
-    # cnn.add(layers.BatchNormalization())
-    # cnn.add(layers.LeakyReLU())
-
-    cnn.add(layers.Conv2D(64, 5, strides=2, padding='same'))
-    cnn.add(layers.BatchNormalization())
-    cnn.add(layers.LeakyReLU())
-    # cnn.add(layers.Dropout(0.2))
-
-    # cnn.add(layers.Conv2D(32, 4, padding='same'))
-    # cnn.add(layers.BatchNormalization())
-    # cnn.add(layers.LeakyReLU())
-
-    cnn.add(layers.Conv2D(64, 5, strides=2, padding='same'))
+    cnn.add(layers.Conv2D(128, 4, padding='same'))
     cnn.add(layers.BatchNormalization())
     cnn.add(layers.LeakyReLU())
 
-    # cnn.add(layers.Dropout(0.2))
+    cnn.add(layers.Conv2D(256, 5, strides=2, padding='same'))
+    cnn.add(layers.BatchNormalization())
+    cnn.add(layers.LeakyReLU())
+    cnn.add(layers.Dropout(0.2))
+
+    cnn.add(layers.Conv2D(128, 4, padding='same'))
+    cnn.add(layers.BatchNormalization())
+    cnn.add(layers.LeakyReLU())
+
+    cnn.add(layers.Conv2D(256, 5, strides=2, padding='same'))
+    cnn.add(layers.BatchNormalization())
+    cnn.add(layers.LeakyReLU())
+    cnn.add(layers.Dropout(0.2))
 
     cnn.add(layers.Flatten())
-    cnn.add(layers.Dense(64))
+    cnn.add(layers.Dense(256))
+    cnn.add(layers.BatchNormalization())
     cnn.add(layers.LeakyReLU())
 
-    cnn.add(layers.Dense(32))
+    cnn.add(layers.Dense(128))
+    cnn.add(layers.BatchNormalization())
     cnn.add(layers.LeakyReLU())
 
     image = layers.Input(shape=(32, 32, color_ch))
@@ -37,5 +39,8 @@ def make_discriminator_model(num_classes, color_ch = 3):
     discriminator = tf.keras.Model(image, classification)
 
     assert discriminator.input_shape == (None, 32, 32, 3)
+
+    cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    discriminator.compile(optimizer=Adam(), loss=cross_entropy)
 
     return discriminator

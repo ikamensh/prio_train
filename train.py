@@ -2,17 +2,12 @@ import time
 
 import tensorflow as tf
 import numpy as np
-from tensorflow.python.keras.optimizers import Adam
 
 from data import cifar_sampler, train_images, train_labels
 from net import make_discriminator_model
 
-
-d = make_discriminator_model(num_classes=10)
-
 cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-d.compile(optimizer=Adam(), loss=cross_entropy)
-
+d = make_discriminator_model(num_classes=10)
 
 from data import BATCH_SIZE
 batches_per_epoch = 300
@@ -28,7 +23,7 @@ def calc_n_images(epochs, batches):
     return ( epochs * batches_per_epoch + batches ) * BATCH_SIZE
 
 print("Started training")
-for epoch in range(50):
+for epoch in range(150):
     print("Epoch", epoch)
 
     t = time.time()
