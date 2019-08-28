@@ -2,6 +2,8 @@ from tensorflow.python.keras import layers
 import tensorflow as tf
 from tensorflow.python.keras.optimizers import Adam
 
+cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+
 def make_discriminator_model(num_classes, color_ch = 3):
     cnn = tf.keras.Sequential()
     cnn.add(layers.Conv2D(128, 4, padding='same'))
@@ -40,7 +42,14 @@ def make_discriminator_model(num_classes, color_ch = 3):
 
     assert discriminator.input_shape == (None, 32, 32, 3)
 
-    cross_entropy = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     discriminator.compile(optimizer=Adam(), loss=cross_entropy)
 
     return discriminator
+
+
+def mock_net(num_classes):
+    cnn = tf.keras.Sequential()
+    cnn.add(layers.Flatten())
+    cnn.add(layers.Dense(num_classes, activation='softmax'))
+    cnn.compile(optimizer=Adam(), loss=cross_entropy)
+    return cnn

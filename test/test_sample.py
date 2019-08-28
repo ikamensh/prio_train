@@ -106,12 +106,62 @@ def test_losses_range(data_100):
 
     batch_size = 50
 
-    s = Sampler(imgs, labels, batch_size)
+    s = Sampler(imgs, labels, batch_size, min_chances=0.)
     losses = np.zeros_like(s._chances)
     losses[50:] = 1
 
     s.update_chances(losses)
 
-    for i in range(10):
-        images1, labels1 = s.sample()
-        assert np.mean(labels) < np.mean(labels1)
+    # for i in range(10):
+    images1, labels1 = s.sample()
+    assert np.mean(labels) < np.mean(labels1)
+
+
+def test_max_prob(data_100):
+    imgs, labels = data_100
+
+    batch_size = 50
+
+    s = Sampler(imgs, labels, batch_size, min_chances=0., max_chances=1e100)
+    losses = np.zeros_like(s._chances)
+    losses[50:] = 1
+    losses[83] = 1e100
+
+    s.update_chances(losses)
+
+    # for i in range(10):
+    images1, labels1 = s.sample()
+    assert np.mean(labels1) == np.mean(np.ones_like(labels) * 83)
+
+
+def test_cap_prob(data_100):
+    imgs, labels = data_100
+
+    batch_size = 50
+
+    s = Sampler(imgs, labels, batch_size, min_chances=0., max_chances=3)
+    losses = np.zeros_like(s._chances)
+    losses[50:] = 1
+    losses[83] = 1e100
+
+    s.update_chances(losses)
+
+    # for i in range(10):
+    images1, labels1 = s.sample()
+    assert np.mean(labels1) < np.mean(np.ones_like(labels) * 83)
+
+def test_cap_min_prob(data_100):
+    imgs, labels = data_100
+
+    batch_size = 50
+
+    s = Sampler(imgs, labels, batch_size, min_chances=0.5, max_chances=1e100)
+    losses = np.zeros_like(s._chances)
+    losses[50:] = 1
+    losses[83] = 1e100
+
+    s.update_chances(losses)
+
+    # for i in range(10):
+    images1, labels1 = s.sample()
+    assert np.mean(labels1) < np.mean(np.ones_like(labels) * 83)
