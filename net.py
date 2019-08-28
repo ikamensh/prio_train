@@ -42,7 +42,7 @@ def make_discriminator_model(num_classes, color_ch = 3):
 
     assert discriminator.input_shape == (None, 32, 32, 3)
 
-    discriminator.compile(optimizer=Adam(), loss=cross_entropy)
+    discriminator.compile(optimizer=Adam(lr=3e-2), loss=cross_entropy)
 
     return discriminator
 

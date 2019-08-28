@@ -1,4 +1,3 @@
-import tensorflow as tf
 from tensorflow.python.keras.callbacks import TensorBoard
 
 from data import train_images, train_labels
