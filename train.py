@@ -2,6 +2,7 @@ import time
 import os
 
 import numpy as np
+import tensorflow as tf
 
 from data import cifar_sampler, train_images, train_labels, test_labels, test_images
 from net import make_discriminator_model, cross_entropy
@@ -37,14 +38,14 @@ def train_model(d, epochs: int):
 
         print(f"Epoch {epoch} done in {time.time() - t:.3f}")
 
-        y_pred = d.predict(train_images)
+        y_pred = tf.convert_to_tensor( d.predict(train_images))
         losses = cross_entropy.call(train_labels, y_pred)
         plot_statistic(losses, f"losses_{epoch}", folder=os.path.join("plots","prioritized", "losses"))
         m_train_loss.add_record(calc_n_images(epoch+1, 0), np.mean(losses))
         cifar_sampler.update_chances(losses)
         plot_statistic(cifar_sampler._chances, f"chances_{epoch}", folder=os.path.join("plots", "prioritized", "chances"))
 
-        test_pred = d.predict(test_images)
+        test_pred = tf.convert_to_tensor( d.predict(test_images))
         test_losses = cross_entropy.call(test_labels, test_pred)
         plot_statistic(test_losses, f"test_losses_{epoch}", folder=os.path.join("plots","prioritized", "test_losses"))
         m_test_loss.add_record(calc_n_images(epoch+1, 0), np.mean(test_losses))
