@@ -28,14 +28,16 @@ def train_epoch_prio(net, current_epoch, metric_batch_loss):
         metric_batch_loss.add_record(calc_n_images(current_epoch, i), loss)
 
 
-def train_epoch_plain(net, current_epoch, metric_batch_loss):
-    net.fit(train_images, train_labels, epochs=1, batch_size=BATCH_SIZE)
+def train_epoch_plain(net, *args):
+    net.fit(train_images, train_labels, epochs=1, batch_size=BATCH_SIZE, verbose=0)
 
 class Tags:
     Prio = "Prio"
     Standard = "Standard"
 
-def train_model(d, epochs: int, tag: str, train_epoch_callable):
+def train_model(epochs: int, tag: str, train_epoch_callable):
+
+    d = make_discriminator_model(num_classes=10)
 
     m_batch_loss = Metric(
         name=f"batch_loss_{tag}", x_label="images trained", y_label="loss_batches"
@@ -93,7 +95,6 @@ def train_model(d, epochs: int, tag: str, train_epoch_callable):
 
 
 if __name__ == "__main__":
-    model = make_discriminator_model(num_classes=10)
-    train_model(model, 3, tag=Tags.Prio, train_epoch_callable=train_epoch_prio)
-    train_model(model, 3, tag=Tags.Standard, train_epoch_callable=train_epoch_plain)
+    train_model(epochs=30, tag=Tags.Prio, train_epoch_callable=train_epoch_prio)
+    train_model(epochs=30, tag=Tags.Standard, train_epoch_callable=train_epoch_plain)
 
