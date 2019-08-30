@@ -95,6 +95,6 @@ def train_model(epochs: int, tag: str, train_epoch_callable):
 
 
 if __name__ == "__main__":
-    train_model(epochs=30, tag=Tags.Prio, train_epoch_callable=train_epoch_prio)
     train_model(epochs=30, tag=Tags.Standard, train_epoch_callable=train_epoch_plain)
+    train_model(epochs=30, tag=Tags.Prio, train_epoch_callable=train_epoch_prio)
 
