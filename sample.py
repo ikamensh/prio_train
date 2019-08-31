@@ -42,16 +42,22 @@ class Sampler:
         self._chances = np.ones_like(self._indexes) / self.size
 
         assert 0 <= min_chances < 1
-        self._min_chances = min_chances * np.ones_like(self._indexes) / self.size
+        self.min_chances_float = min_chances
+        self.min_chances_array = min_chances * np.ones_like(self._indexes) / self.size
 
-    def update_chances(self, losses: np.ndarray):
+    def update_chances(self, losses: np.ndarray, exclude_outliers = False):
         assert losses.shape in ((self.size,), (self.size, 1))
         losses = np.squeeze(losses)
         proportional = losses / np.median(losses)
-        proportional = np.min([proportional, np.ones_like(proportional) * self.max_chances], axis=0)
+        if exclude_outliers:
+            mask = proportional > np.ones_like(proportional) * self.max_chances
+            proportional[mask] = self.min_chances_float
+        else:
+            proportional = np.min([proportional, np.ones_like(proportional) * self.max_chances], axis=0)
+
         proportional /= np.sum(proportional)
 
-        self._chances =  proportional + self._min_chances
+        self._chances =  proportional + self.min_chances_array
         self._chances /= np.sum(self._chances)
 
     def sample(self):

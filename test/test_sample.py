@@ -112,9 +112,9 @@ def test_losses_range(data_100):
 
     s.update_chances(losses)
 
-    # for i in range(10):
-    images1, labels1 = s.sample()
-    assert np.mean(labels) < np.mean(labels1)
+    for i in range(10):
+        images1, labels1 = s.sample()
+        assert np.mean(labels) < np.mean(labels1)
 
 
 def test_max_prob(data_100):
@@ -129,9 +129,9 @@ def test_max_prob(data_100):
 
     s.update_chances(losses)
 
-    # for i in range(10):
-    images1, labels1 = s.sample()
-    assert np.mean(labels1) == np.mean(np.ones_like(labels) * 83)
+    for i in range(10):
+        images1, labels1 = s.sample()
+        assert np.mean(labels1) == 83
 
 
 def test_cap_prob(data_100):
@@ -146,9 +146,25 @@ def test_cap_prob(data_100):
 
     s.update_chances(losses)
 
-    # for i in range(10):
-    images1, labels1 = s.sample()
-    assert np.mean(labels1) < np.mean(np.ones_like(labels) * 83)
+    for i in range(10):
+        images1, labels1 = s.sample()
+        assert np.mean(labels1) < 83
+
+
+def test_exclude_outliers(data_100):
+    imgs, labels = data_100
+
+    batch_size = 50
+
+    s = Sampler(imgs, labels, batch_size, min_chances=0., max_chances=3)
+    losses = np.ones_like(s._chances)
+    losses[60:] = 10
+
+    s.update_chances(losses, exclude_outliers=True)
+
+    for i in range(10):
+        images1, labels1 = s.sample()
+        assert np.mean(labels1) < 50
 
 def test_cap_min_prob(data_100):
     imgs, labels = data_100
@@ -162,6 +178,6 @@ def test_cap_min_prob(data_100):
 
     s.update_chances(losses)
 
-    # for i in range(10):
-    images1, labels1 = s.sample()
-    assert np.mean(labels1) < np.mean(np.ones_like(labels) * 83)
+    for i in range(10):
+        images1, labels1 = s.sample()
+        assert np.mean(labels1) < 83
