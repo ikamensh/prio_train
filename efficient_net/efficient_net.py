@@ -377,7 +377,8 @@ def efficientnet_model(channels,
     x = nn.Dense(
         units=classes,
         input_dim=in_channels,
-        name="output/fc")(x)
+        name="output/fc",
+        activation='softmax')(x)
 
     model = Model(inputs=input, outputs=x)
     model.in_size = in_size
