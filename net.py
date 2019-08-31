@@ -48,6 +48,14 @@ def make_discriminator_model(num_classes, color_ch = 3):
     return cnn
 
 
+
+def make_sota_model():
+    from efficient_net.efficient_net import get_efficientnet
+    model = get_efficientnet((32, 32), classes=10)
+    model.compile(optimizer=Adam(), loss=cross_entropy)
+    return model
+
+
 def mock_net(num_classes):
     cnn = tf.keras.Sequential()
     cnn.add(layers.Flatten())

@@ -11,8 +11,8 @@ __all__ = ['efficientnet_model', 'efficientnet_b0', 'efficientnet_b1', 'efficien
 
 import os
 import math
-from keras import layers as nn
-from keras.models import Model
+from tensorflow.python.keras import layers as nn
+from tensorflow.python.keras.models import Model
 from .common import is_channels_first, conv1x1_block, conv3x3_block, dwconv3x3_block, dwconv5x5_block, se_block
 
 
@@ -385,13 +385,10 @@ def efficientnet_model(channels,
     return model
 
 
-def get_efficientnet(version,
-                     in_size,
+def get_efficientnet(in_size,
+                     classes = 10,
                      tf_mode=False,
                      bn_epsilon=1e-5,
-                     model_name=None,
-                     pretrained=False,
-                     root=os.path.join("~", ".keras", "models"),
                      **kwargs):
     """
     Create EfficientNet model with specific parameters.
@@ -413,52 +410,15 @@ def get_efficientnet(version,
         Location for keeping the model parameters.
     """
 
-    if version == "b0":
-        assert (in_size == (224, 224))
-        depth_factor = 1.0
-        width_factor = 1.0
-        dropout_rate = 0.2
-    elif version == "b1":
-        assert (in_size == (240, 240))
-        depth_factor = 1.1
-        width_factor = 1.0
-        dropout_rate = 0.2
-    elif version == "b2":
-        assert (in_size == (260, 260))
-        depth_factor = 1.2
-        width_factor = 1.1
-        dropout_rate = 0.3
-    elif version == "b3":
-        assert (in_size == (300, 300))
-        depth_factor = 1.4
-        width_factor = 1.2
-        dropout_rate = 0.3
-    elif version == "b4":
-        assert (in_size == (380, 380))
-        depth_factor = 1.8
-        width_factor = 1.4
-        dropout_rate = 0.4
-    elif version == "b5":
-        assert (in_size == (456, 456))
-        depth_factor = 2.2
-        width_factor = 1.6
-        dropout_rate = 0.4
-    elif version == "b6":
-        assert (in_size == (528, 528))
-        depth_factor = 2.6
-        width_factor = 1.8
-        dropout_rate = 0.5
-    elif version == "b7":
-        assert (in_size == (600, 600))
-        depth_factor = 3.1
-        width_factor = 2.0
-        dropout_rate = 0.5
-    else:
-        raise ValueError("Unsupported EfficientNet version {}".format(version))
+    assert (in_size == (32, 32))
+    depth_factor = 1.0
+    width_factor = 1.0
+    dropout_rate = 0.2
+
 
     init_block_channels = 32
     layers = [1, 2, 2, 3, 3, 4, 1]
-    downsample = [1, 1, 1, 1, 0, 1, 0]
+    downsample = [1, 0, 1, 0, 0, 1, 0]
     channels_per_layers = [16, 24, 40, 80, 112, 192, 320]
     expansion_factors_per_layers = [1, 6, 6, 6, 6, 6, 6]
     kernel_sizes_per_layers = [3, 3, 5, 3, 5, 5, 3]
@@ -481,11 +441,9 @@ def get_efficientnet(version,
 
     init_block_channels = round_channels(init_block_channels, width_factor)
 
-    if width_factor > 1.0:
-        assert (int(final_block_channels * width_factor) == round_channels(final_block_channels, width_factor))
-        final_block_channels = round_channels(final_block_channels, width_factor)
 
     net = efficientnet_model(
+        classes=classes,
         channels=channels,
         init_block_channels=init_block_channels,
         final_block_channels=final_block_channels,
@@ -498,14 +456,6 @@ def get_efficientnet(version,
         in_size=in_size,
         **kwargs)
 
-    if pretrained:
-        if (model_name is None) or (not model_name):
-            raise ValueError("Parameter `model_name` should be properly initialized for loading pretrained model.")
-        from .model_store import download_model
-        download_model(
-            net=net,
-            model_name=model_name,
-            local_model_store_dir_path=root)
 
     return net
 
