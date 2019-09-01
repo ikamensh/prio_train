@@ -1,3 +1,4 @@
+from typing import List
 from ilya_ezplot import plot_group, Metric
 
 ms = Metric.load_all()
@@ -15,6 +16,9 @@ test_acc_ms = [m for m in ms if 'test_acc' in m.name]
 
 plot_group(train_ms, smoothen=False, name='train_precise')
 plot_group(train_ms, name='train_smooth')
+
+def plot_2_ways(ms: List[Metric]):
+
 
 
 plot_group(test_ms, smoothen=False, name='test_precise')
