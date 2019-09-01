@@ -1,31 +1,20 @@
-from typing import List
 from ilya_ezplot import plot_group, Metric
 
-ms = Metric.load_all()
+all_metrics = Metric.load_all()
 
-train_ms = [m for m in ms if 'train_loss' in m.name]
-test_ms = [m for m in ms if 'test_loss' in m.name]
+def plot_2_ways(filter: str):
+    metrics = [m for m in all_metrics if filter in m.name]
 
-train_acc_ms = [m for m in ms if 'train_acc' in m.name]
-test_acc_ms = [m for m in ms if 'test_acc' in m.name]
+    unique_names = {m.name for m in metrics}
+    grouped_ms = []
+    for name in unique_names:
+        ms = [m for m in metrics if m.name == name]
+        grouped_ms.append(sum(ms))
 
-#
-# plot_group(ms, smoothen=False, name='all_precise')
-# plot_group(ms, name='all_smooth')
+    plot_group(grouped_ms, smoothen=False, name=f'{filter}_precise')
+    plot_group(grouped_ms, name=f'{filter}_smooth')
 
-
-plot_group(train_ms, smoothen=False, name='train_precise')
-plot_group(train_ms, name='train_smooth')
-
-def plot_2_ways(ms: List[Metric]):
-
-
-
-plot_group(test_ms, smoothen=False, name='test_precise')
-plot_group(test_ms, name='test_smooth')
-
-plot_group(train_acc_ms, smoothen=False, name='acc_train_precise')
-plot_group(train_acc_ms, name='acc_train_smooth')
-
-plot_group(test_acc_ms, smoothen=False, name='acc_test_precise')
-plot_group(test_acc_ms, name='acc_test_smooth')
+plot_2_ways('train_loss')
+plot_2_ways('test_loss')
+plot_2_ways('train_acc')
+plot_2_ways('test_acc')
