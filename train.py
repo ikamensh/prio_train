@@ -23,8 +23,8 @@ def calc_n_images(epochs, batches):
 
 def train_epoch_prio(net, current_epoch, metric_batch_loss, m_batch_acc):
     for i in range(batches_per_epoch):
-        x, y = cifar_sampler.sample()
-        loss, acc = net.train_on_batch(x, y)
+        x, y, w = cifar_sampler.sample()
+        loss, acc = net.train_on_batch(x, y, sample_weight=w)
         metric_batch_loss.add_record(calc_n_images(current_epoch, i), loss)
         m_batch_acc.add_record(calc_n_images(current_epoch, i) ,acc)
 
@@ -35,9 +35,9 @@ class Tags:
     Prio = "Prio"
     Standard = "Standard"
 
-def train_model(epochs: int, tag: str, train_epoch_callable):
+def train_model(epochs: int, tag: str, train_epoch_callable, model_callable):
 
-    d = make_sota_model()
+    d = model_callable()
 
     m_batch_loss = Metric(
         name=f"batch_loss_{tag}", x_label="images trained", y_label="loss_batches"
@@ -108,6 +108,7 @@ def train_model(epochs: int, tag: str, train_epoch_callable):
 
     if tag == Tags.Prio:
         m_batch_loss.save()
+
     m_train_loss.save()
     m_test_loss.save()
     m_train_acc.save()
@@ -115,6 +116,6 @@ def train_model(epochs: int, tag: str, train_epoch_callable):
 
 
 if __name__ == "__main__":
-    train_model(epochs=100, tag=Tags.Standard, train_epoch_callable=train_epoch_plain)
-    train_model(epochs=100, tag=Tags.Prio, train_epoch_callable=train_epoch_prio)
+    train_model(epochs=100, tag=Tags.Standard, train_epoch_callable=train_epoch_plain, model_callable=make_sota_model)
+    train_model(epochs=100, tag=Tags.Prio, train_epoch_callable=train_epoch_prio, model_callable=make_sota_model)
 

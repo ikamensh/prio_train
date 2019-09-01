@@ -61,7 +61,7 @@ def mock_net(num_classes):
     cnn = tf.keras.Sequential()
     cnn.add(layers.Flatten())
     cnn.add(layers.Dense(num_classes, activation='softmax'))
-    cnn.compile(optimizer=Adam(), loss=cross_entropy)
+    cnn.compile(optimizer=Adam(), loss=cross_entropy, metrics=[sparse_categorical_accuracy])
     return cnn
 
 

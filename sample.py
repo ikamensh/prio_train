@@ -31,7 +31,9 @@ class Sampler:
             self.size > batch_size
         ), "batch size must be less than the number of data samples"
 
-        self.data = np.array(list(zip(images, labels)))
+        self.images = images
+        self.labels = labels
+
         self.batch_size = batch_size
         
 
@@ -40,6 +42,7 @@ class Sampler:
 
         self._indexes = np.arange(0, self.size, dtype=np.int)
         self._chances = np.ones_like(self._indexes) / self.size
+        self._weights = np.ones_like(self._indexes)
 
         assert 0 <= min_chances < 1
         self.min_chances_float = min_chances
@@ -59,11 +62,12 @@ class Sampler:
 
         self._chances =  proportional + self.min_chances_array
         self._chances /= np.sum(self._chances)
+        self._weights = 1 / ( self._chances + 1e-9)
 
     def sample(self):
         selected_idx = np.random.choice(self._indexes, self.batch_size, p=self._chances)
-        data = self.data[selected_idx]
-        imgs, labels = list(zip(*data))
-        imgs = np.vstack([np.expand_dims(i, axis=0) for i in imgs])
-        labels = np.vstack([np.expand_dims(i, axis=0) for i in labels])
-        return imgs, labels
+        imgs = self.images[selected_idx]
+        labels = self.labels[selected_idx]
+        weights = self._weights[selected_idx]
+
+        return imgs, labels, weights
