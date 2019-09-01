@@ -117,6 +117,6 @@ def train_model(epochs: int, tag: str, train_epoch_callable, model_callable):
 
 if __name__ == "__main__":
     for i in range(5):
-        train_model(epochs=30, tag=f"{Tags.Standard}_{i}", train_epoch_callable=train_epoch_plain, model_callable=make_sota_model)
-        train_model(epochs=30, tag=f"{Tags.Prio}_{i}", train_epoch_callable=train_epoch_prio, model_callable=make_sota_model)
+        train_model(epochs=30, tag=f"{Tags.Standard}${i}", train_epoch_callable=train_epoch_plain, model_callable=make_sota_model)
+        train_model(epochs=30, tag=f"{Tags.Prio}${i}", train_epoch_callable=train_epoch_prio, model_callable=make_sota_model)
 

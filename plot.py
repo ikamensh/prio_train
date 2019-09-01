@@ -5,7 +5,7 @@ all_metrics = Metric.load_all()
 def plot_2_ways(filter: str):
     metrics = [m for m in all_metrics if filter in m.name]
 
-    unique_names = {m.name for m in metrics}
+    unique_names = {m.name.split('$')[0] for m in metrics}
     grouped_ms = []
     for name in unique_names:
         ms = [m for m in metrics if m.name == name]
