@@ -12,7 +12,7 @@ test_images = (test_images - 127.5) / 127.5  # Normalize the images to [-1, 1]
 
 from sample import Sampler
 
-cifar_sampler = Sampler(train_images, train_labels, 64, min_chances=0.3, max_chances=3.)
+cifar_sampler = Sampler(train_images, train_labels, 64)
 
 import numpy as np
 
