@@ -265,7 +265,7 @@ def effi_init_block(x,
         x=x,
         in_channels=in_channels,
         out_channels=out_channels,
-        strides=2,
+        strides=1,
         padding=(0 if tf_mode else 1),
         bn_epsilon=bn_epsilon,
         activation=activation,
@@ -419,7 +419,7 @@ def get_efficientnet(in_size,
 
     init_block_channels = 32
     layers = [1, 2, 2, 3, 3, 4, 1]
-    downsample = [1, 0, 1, 0, 0, 1, 0]
+    downsample = [1, 1, 1, 1, 0, 1, 0]
     channels_per_layers = [16, 24, 40, 80, 112, 192, 320]
     expansion_factors_per_layers = [1, 6, 6, 6, 6, 6, 6]
     kernel_sizes_per_layers = [3, 3, 5, 3, 5, 5, 3]
@@ -430,14 +430,24 @@ def get_efficientnet(in_size,
     channels_per_layers = [round_channels(ci, width_factor) for ci in channels_per_layers]
 
     from functools import reduce
-    channels = reduce(lambda x, y: x + [[y[0]] * y[1]] if y[2] != 0 else x[:-1] + [x[-1] + [y[0]] * y[1]],
-                      zip(channels_per_layers, layers, downsample), [])
-    kernel_sizes = reduce(lambda x, y: x + [[y[0]] * y[1]] if y[2] != 0 else x[:-1] + [x[-1] + [y[0]] * y[1]],
-                          zip(kernel_sizes_per_layers, layers, downsample), [])
-    expansion_factors = reduce(lambda x, y: x + [[y[0]] * y[1]] if y[2] != 0 else x[:-1] + [x[-1] + [y[0]] * y[1]],
-                               zip(expansion_factors_per_layers, layers, downsample), [])
-    strides_per_stage = reduce(lambda x, y: x + [[y[0]] * y[1]] if y[2] != 0 else x[:-1] + [x[-1] + [y[0]] * y[1]],
-                               zip(strides_per_stage, layers, downsample), [])
+
+    def magic(reduce_list, zp):
+        reducible, layers, dwnsample = zp
+        if dwnsample != 0:
+            return reduce_list + [[reducible] * layers]
+        else:
+            initial = []
+            if reduce_list:
+                initial = reduce_list[-1]
+
+            return reduce_list[:-1] + [initial + [reducible] * layers]
+
+
+
+    channels = reduce(magic, zip(channels_per_layers, layers, downsample), [])
+    kernel_sizes = reduce(magic, zip(kernel_sizes_per_layers, layers, downsample), [])
+    expansion_factors = reduce(magic, zip(expansion_factors_per_layers, layers, downsample), [])
+    strides_per_stage = reduce(magic, zip(strides_per_stage, layers, downsample), [])
     strides_per_stage = [si[0] for si in strides_per_stage]
 
     init_block_channels = round_channels(init_block_channels, width_factor)
