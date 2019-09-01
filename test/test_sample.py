@@ -158,13 +158,11 @@ def test_exclude_outliers(data_100):
 
     s = Sampler(imgs, labels, batch_size, min_chances=0., max_chances=3)
     losses = np.ones_like(s._chances)
-    losses[60:] = 10
+    losses[-1] = 10
 
     s.update_chances(losses, exclude_outliers=True)
 
-    for i in range(10):
-        images1, labels1 = s.sample()
-        assert np.mean(labels1) < 50
+    assert s._chances[-1] < np.mean(s._chances)
 
 def test_cap_min_prob(data_100):
     imgs, labels = data_100

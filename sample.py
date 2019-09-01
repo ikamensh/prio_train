@@ -7,8 +7,8 @@ class Sampler:
         images: np.ndarray,
         labels: np.ndarray,
         batch_size: int,
-        min_chances: float = 0.1,
-        max_chances: float = 10,
+        min_chances: float = 0.3,
+        max_chances: float = 3,
     ):
         """
 
@@ -48,12 +48,12 @@ class Sampler:
     def update_chances(self, losses: np.ndarray, exclude_outliers = False):
         assert losses.shape in ((self.size,), (self.size, 1))
         losses = np.squeeze(losses)
-        proportional = losses / np.median(losses)
+        proportional = losses / np.percentile(losses, 75)
         if exclude_outliers:
-            mask = proportional > np.ones_like(proportional) * self.max_chances
+            mask = proportional > np.percentile(proportional, 99)
             proportional[mask] = self.min_chances_float
-        else:
-            proportional = np.min([proportional, np.ones_like(proportional) * self.max_chances], axis=0)
+
+        proportional = np.min([proportional, np.ones_like(proportional) * self.max_chances], axis=0)
 
         proportional /= np.sum(proportional)
 
