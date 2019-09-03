@@ -22,7 +22,7 @@ class Sampler:
             len(images.shape) == 4
         ), "images are expected as 4d tensor of shape [samples, w, h, ch]"
         assert (
-            len(labels.shape) == 2
+            len(labels.shape) in (1, 2)
         ), "labels are expected as 2d tensor of shape [samples, 1]"
 
         self.size = images.shape[0]
@@ -31,10 +31,15 @@ class Sampler:
             self.size > batch_size
         ), "batch size must be less than the number of data samples"
 
+        if len(labels.shape) == 1:
+            labels = np.expand_dims(labels, axis=1)
+        assert labels.shape[1] == 1
+
         self.images = images
         self.labels = labels
 
         self.batch_size = batch_size
+        self.batches_per_epoch = len(images) // self.batch_size
         
 
         assert max_chances > 1

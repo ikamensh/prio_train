@@ -1,2 +1,2 @@
-global_epoch = 1
+epoch = None
 step = 0
